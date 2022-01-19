@@ -6,7 +6,7 @@ from datetime import datetime
 
 
 intents = nextcord.Intents.all()
-TOKEN = "OTMyNjgwNTEyNTAwMjgxNDA1.YeWgag.zqCy2NyrN3mmXsPJPwVFfVwVDjk"
+TOKEN = process.env.TOKEN
 commandsNames = []
 
 
