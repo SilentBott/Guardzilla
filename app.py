@@ -7,7 +7,8 @@ from keep_alive import keep_alive
 
 
 intents = nextcord.Intents.all()
-TOKEN = process.env.TOKEN
+TOKEN = os.environ['TOKEN']
+
 commandsNames = []
 
 
