@@ -3,7 +3,6 @@ from nextcord.ext import commands
 import json
 import os
 from datetime import datetime
-from keep_alive import keep_alive
 
 
 intents = nextcord.Intents.all()
@@ -60,5 +59,4 @@ for pyFile in os.listdir("./commands"):
         print(f"{pyFile[:-3]} | Loaded")
 
 
-keep_alive()
 client.run(TOKEN)
