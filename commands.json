@@ -20,14 +20,14 @@
         "nick": ["<member> [nick name]", "to change member nickname", "manage nicknames perms", ["prefix-nick member-id Awsome person"], ""],
         "embed": ["[phrase]", "to make reaction that if any one pressed it will get role", "manage messages perms", ["prefix-embed Hi all"], ""],
         "warn": ["<member> [reason]", "to warn someone", "manage messages perms", ["prefix-clear 1", "prefix-warn member-id", "prefix-warn member-mention cuz i hate him/her"], ""],
+        "reaction-role": ["<message id> <custom emoji> <role>", "to put reaction and make anyone click it it get the role", "manage roles perms", ["prefix-reaction-role msg-id emoji- role-"], ""],
+        "button-link": ["<link> <button label> <emoji> [embed message]", "to make button", "manage messages perms", ["prefix-button-link https://www.google.com Click_me emoji- If you click the button below you will go to the website"], ""],
         "removewarn": ["<member> <number>", "to remove warn from someone", "manage messages perms", ["prefix-removewarn member-id 1", "prefix-warn member-mention 2"], ""]
            
     }, "", "To show Admin Commands"],
     "Server admin commands": [{
         "set-prefix": ["<prefix>", "to change server prefix", "manage messages perms", ["prefix-set-prefix -", "prefix-set-prefix #"], ","],
-        "reaction-role": ["<message id> <custom emoji> <role>", "to put reaction and make anyone click it it get the role", "manage roles perms", ["prefix-reaction-role msg-id emoji- role-"], ""],
         "chat-filter": ["<true / false>", "enable/disable the chat filter (delete bad words)", "manage messages perms", ["prefix-chat-filter Enable", "prefix-chat-filter Disable"], ""],
-        "button-link": ["<link> <button label> <emoji> [embed message]", "to make button", "manage messages perms", ["prefix-button-link https://www.google.com Click_me emoji- If you click the button below you will go to the website"], ""],
         "suggest-room": ["<Text channel>", "to make room for suggestion", "manage messages perms", ["prefix-suggest-room", "prefix-suggest-room room-mention", "prefix-suggest-room room-id"], ""]
         
     }, "", "To show Admin Commands"],
