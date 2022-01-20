@@ -10,22 +10,26 @@
         "kick": ["<member> [reason]", "to kick someone", "Kick members perms", [], "922786678454771742"],
         "ban": ["<member> [reason]", "to ban someone", "Ban members perms", [], "922790457556226078"],
         "unban": ["<member>", "to unban someone", "Ban members perms", [], ""],
-        "set-prefix": ["<prefix>", "to change server prefix", "manage messages perms", ["prefix-set-prefix -", "prefix-set-prefix #"], ","],
-        "reaction-role": ["<message id> <custom emoji> <role>", "to put reaction and make anyone click it it get the role", "manage roles perms", ["prefix-reaction-role msg-id emoji- role-"], ""],
-        "chat-filter": ["<true / false>", "enable/disable the chat filter (delete bad words)", "manage messages perms", ["prefix-chat-filter Enable", "prefix-chat-filter Disable"], ""],
         "add-bad-words": ["[words]", "to make reaction that if any one pressed it will get role", "manage messages perms", ["prefix-add-bad-words f*** trash"], ""],
         "remove-bad-words": ["[words]", "to remove the bad words in the list", "manage messages perms", ["prefix-remove-bad-words f*** trash"], ""],
-        "button-link": ["<link> <button label> <emoji> [embed message]", "to make button", "manage messages perms", ["prefix-button-link https://www.google.com Click_me emoji- If you click the button below you will go to the website"], ""],
-        "suggest-room": ["<Text channel>", "to make room for suggestion", "manage messages perms", ["prefix-suggest-room", "prefix-suggest-room room-mention", "prefix-suggest-room room-id"], ""],
-        "warn": ["<member> [reason]", "to warn someone", "manage messages perms", ["prefix-clear 1", "prefix-warn member-id", "prefix-warn member-mention cuz i hate him/her"], ""],
-        "removewarn": ["<member> <number>", "to remove warn from someone", "manage messages perms", ["prefix-removewarn member-id 1", "prefix-warn member-mention 2"], ""],
         "clear": ["<number> <member> <channel>", "to clear messages in a channel / to clear messages from someone only in the last 100 msg on each channel", "manage messages perms", ["prefix-clear 1", "prefix-clear 20"], ""],
         "mute": ["<member>", "to make someone unable to send messages in text channels", "manage messages perms", [], ""],
         "unmute": ["<member>", "to Cancel the effect of the mute command", "manage messages perms", [], ""],
         "hide": ["<channel>", "Make any channel unvisible to normal people", "manage messages perms", ["prefix-hide room-mention", "prefix-show room-id"], ""],
         "show": ["<channel>", "Make any channel visible to normal people", "manage messages perms", ["prefix-show room-mention", "prefix-show room-id"], ""],
+        "nick": ["<member> [nick name]", "to change member nickname", "manage nicknames perms", ["prefix-nick member-id Awsome person"], ""],
         "embed": ["[phrase]", "to make reaction that if any one pressed it will get role", "manage messages perms", ["prefix-embed Hi all"], ""],
-        "nick": ["<member> [nick name]", "to change member nickname", "manage nicknames perms", ["prefix-nick member-id Awsome person"], ""]
+        "warn": ["<member> [reason]", "to warn someone", "manage messages perms", ["prefix-clear 1", "prefix-warn member-id", "prefix-warn member-mention cuz i hate him/her"], ""],
+        "removewarn": ["<member> <number>", "to remove warn from someone", "manage messages perms", ["prefix-removewarn member-id 1", "prefix-warn member-mention 2"], ""]
+           
+    }, "", "To show Admin Commands"],
+    "Server admin commands": [{
+        "set-prefix": ["<prefix>", "to change server prefix", "manage messages perms", ["prefix-set-prefix -", "prefix-set-prefix #"], ","],
+        "reaction-role": ["<message id> <custom emoji> <role>", "to put reaction and make anyone click it it get the role", "manage roles perms", ["prefix-reaction-role msg-id emoji- role-"], ""],
+        "chat-filter": ["<true / false>", "enable/disable the chat filter (delete bad words)", "manage messages perms", ["prefix-chat-filter Enable", "prefix-chat-filter Disable"], ""],
+        "button-link": ["<link> <button label> <emoji> [embed message]", "to make button", "manage messages perms", ["prefix-button-link https://www.google.com Click_me emoji- If you click the button below you will go to the website"], ""],
+        "suggest-room": ["<Text channel>", "to make room for suggestion", "manage messages perms", ["prefix-suggest-room", "prefix-suggest-room room-mention", "prefix-suggest-room room-id"], ""]
+        
     }, "", "To show Admin Commands"],
 
     "Bot Admin Commands": [{
