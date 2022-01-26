@@ -84,22 +84,25 @@ class Log(commands.Cog):
             return
         with open("./logs.json", ) as f:
             log = json.loads(f.read())
-        if str(before.guild.id) in log:
-            log_c = log[str(before.guild.id)]["chat"]
-            if before.content != after.content:
+        try:
+            if str(before.guild.id) in log:
+                log_c = log[str(before.guild.id)]["chat"]
+                if before.content != after.content:
 
-                embed = msg_f({
-                    "title": "Message edited",
-                    "value": [["From: ", f"{before.author.name} | {before.author.id}"],
-                              ["Before: ", f"{before.content}"],
-                              ["after: ", f"{after.content}"],
-                              ["channel:",
-                               f"{before.channel.name} | {before.channel.id}"],
-                              ["Msg id:", f"{before.id}"]
-                              ]})
-                channel = await before.guild.fetch_channel(log_c)
-                await channel.send(embed=embed)
-                # message edited
+                    embed = msg_f({
+                        "title": "Message edited",
+                        "value": [["From: ", f"{before.author.name} | {before.author.id}"],
+                                  ["Before: ", f"{before.content}"],
+                                  ["after: ", f"{after.content}"],
+                                  ["channel:",
+                                   f"{before.channel.name} | {before.channel.id}"],
+                                  ["Msg id:", f"{before.id}"]
+                                  ]})
+                    channel = await before.guild.fetch_channel(log_c)
+                    await channel.send(embed=embed)
+                    # message edited
+        except AttributeError:
+            pass
 
     @commands.Cog.listener()
     async def on_message_delete(self, message):
@@ -194,45 +197,48 @@ class Log(commands.Cog):
     async def on_member_update(self, before, after):
         with open("./logs.json", ) as f:
             log = json.loads(f.read())
-        if str(before.guild.id) in log:  # nickname changed
-            if before.display_name != after.display_name:
-                log_c = log[str(before.guild.id)]["member"]
-                async for entry in before.guild.audit_logs(limit=1, action=nextcord.AuditLogAction.member_update):
-                    entery = entry
-                embed = msg_f({
-                    "title": "Nickname changed",
-                    "value": [
-                        ["The account name:", f"{before.name}", False],
-                        ["Old:", f"{before.display_name}"],
-                        ["New:", f"{after.display_name}"],
-                        ["Changed by:",
-                         f"{entry.user.name} | {entry.user.id}", False]]})
-                channel = await before.guild.fetch_channel(log_c)
-                await channel.send(embed=embed)
-            elif before.roles != after.roles:  # role changed
-                log_c = log[str(before.guild.id)]["role"]
-                async for entry in before.guild.audit_logs(limit=1, action=nextcord.AuditLogAction.member_role_update):
-                    entery = entry
-                o = False
-                if len(before.roles) < len(after.roles):  # role removed
+        try:
+            if str(before.guild.id) in log:  # nickname changed
+                if before.display_name != after.display_name:
+                    log_c = log[str(before.guild.id)]["member"]
+                    async for entry in before.guild.audit_logs(limit=1, action=nextcord.AuditLogAction.member_update):
+                        entery = entry
                     embed = msg_f({
-                        "title": "Role added",
+                        "title": "Nickname changed",
                         "value": [
-                            ["TO:", f"{before.name} | {before.id}"],
-                            ["By:", f"{entery.user.name} | {entery.user.id}"],
-                            ["Role:", f"{entery.changes.after.roles[0].name} | {entery.changes.after.roles[0].id}"]]})
-                    o = True
-                elif len(before.roles) > len(after.roles):
-                    embed = msg_f({
-                        "title": "Role removed",
-                        "value": [
-                            ["From:", f"{before.name} | {before.id}"],
-                            ["By:", f"{entery.user.name} | {entery.user.id}"],
-                            ["Role:", f"{entery.changes.before.roles[0].name} | {entery.changes.before.roles[0].id}"]]})
-                    o = True
-                if o:
+                            ["The account name:", f"{before.name}", False],
+                            ["Old:", f"{before.display_name}"],
+                            ["New:", f"{after.display_name}"],
+                            ["Changed by:",
+                             f"{entry.user.name} | {entry.user.id}", False]]})
                     channel = await before.guild.fetch_channel(log_c)
                     await channel.send(embed=embed)
+                elif before.roles != after.roles:  # role changed
+                    log_c = log[str(before.guild.id)]["role"]
+                    async for entry in before.guild.audit_logs(limit=1, action=nextcord.AuditLogAction.member_role_update):
+                        entery = entry
+                    o = False
+                    if len(before.roles) < len(after.roles):  # role removed
+                        embed = msg_f({
+                            "title": "Role added",
+                            "value": [
+                                ["TO:", f"{before.name} | {before.id}"],
+                                ["By:", f"{entery.user.name} | {entery.user.id}"],
+                                ["Role:", f"{entery.changes.after.roles[0].name} | {entery.changes.after.roles[0].id}"]]})
+                        o = True
+                    elif len(before.roles) > len(after.roles):
+                        embed = msg_f({
+                            "title": "Role removed",
+                            "value": [
+                                ["From:", f"{before.name} | {before.id}"],
+                                ["By:", f"{entery.user.name} | {entery.user.id}"],
+                                ["Role:", f"{entery.changes.before.roles[0].name} | {entery.changes.before.roles[0].id}"]]})
+                        o = True
+                    if o:
+                        channel = await before.guild.fetch_channel(log_c)
+                        await channel.send(embed=embed)
+        except AttributeError:
+            pass
 
     @commands.guild_only()
     @commands.Cog.listener()
@@ -241,37 +247,40 @@ class Log(commands.Cog):
             return
         with open("./logs.json", ) as f:
             r = json.loads(f.read())
-        if str(before.guild.id) in log:
-            if before.name != after.name:
-                log_c = log[str(before.guild.id)]["member"]
-                embed = msg_f({
-                    "title": "name changed",
-                    "value": [
-                        ["Old:", f"{before.name}"],
-                        ["New:", f"{after.name}"]]})
-                channel = await before.guild.fetch_channel(log_c)
-                await channel.send(embed=embed)
-                # username changed
-            elif before.discriminator != after.discriminator:
-                log_c = log[str(before.guild.id)]["member"]
-                embed = msg_f({
-                    "title": "discriminator changed",
-                    "value": [
-                        ["Old:", f"{before.discriminator}"],
-                        ["New:", f"{after.discriminator}"]]})
-                channel = await before.guild.fetch_channel(log_c)
-                await channel.send(embed=embed)
-                # discriminator changed
-            elif before.avatar.url != after.avatar.url:
-                log_c = log[str(before.guild.id)]["member"]
-                embed = msg_f({
-                    "title": "avatar changed",
-                    "value": [
-                        ["Old:", f"{before.avatar.url}"],
-                        ["New:", f"{after.avatar.url}"]]})
-                channel = await before.guild.fetch_channel(log_c)
-                await channel.send(embed=embed)
-                # avatar changed
+        try:
+            if str(before.guild.id) in log:
+                if before.name != after.name:
+                    log_c = log[str(before.guild.id)]["member"]
+                    embed = msg_f({
+                        "title": "name changed",
+                        "value": [
+                            ["Old:", f"{before.name}"],
+                            ["New:", f"{after.name}"]]})
+                    channel = await before.guild.fetch_channel(log_c)
+                    await channel.send(embed=embed)
+                    # username changed
+                elif before.discriminator != after.discriminator:
+                    log_c = log[str(before.guild.id)]["member"]
+                    embed = msg_f({
+                        "title": "discriminator changed",
+                        "value": [
+                            ["Old:", f"{before.discriminator}"],
+                            ["New:", f"{after.discriminator}"]]})
+                    channel = await before.guild.fetch_channel(log_c)
+                    await channel.send(embed=embed)
+                    # discriminator changed
+                elif before.avatar.url != after.avatar.url:
+                    log_c = log[str(before.guild.id)]["member"]
+                    embed = msg_f({
+                        "title": "avatar changed",
+                        "value": [
+                            ["Old:", f"{before.avatar.url}"],
+                            ["New:", f"{after.avatar.url}"]]})
+                    channel = await before.guild.fetch_channel(log_c)
+                    await channel.send(embed=embed)
+                    # avatar changed
+        except AttributeError:
+            pass
 
     @commands.guild_only()
     @commands.Cog.listener()
@@ -314,39 +323,42 @@ class Log(commands.Cog):
     async def on_guild_role_update(self, before, after):
         with open("./logs.json", ) as f:
             log = json.loads(f.read())
-        if str(before.guild.id) in log:
-            async for entry in before.guild.audit_logs(limit=1, action=nextcord.AuditLogAction.role_update):
-                entery = entry
-            if entry.target.id != before.id:
-                return
-            print(before, after)
-            log_c = log[str(before.guild.id)]["role"]
-            r = [perm[0].replace(
-                "_", " ").replace("guild", "server") for perm in before.permissions if perm not in after.permissions and perm[1]]
-            a = [perm[0].replace(
-                "_", " ").replace("guild", "server") for perm in after.permissions if perm not in before.permissions and perm[1]]
-            s = []
-            if after.name == before.name:
-                s.append(
-                    ["Role Name:", f"{before.name} | {before.id}"])
-            else:
-                s.append(
-                    ["Old name:", f"{before.name} | {before.id}"])
-                s.append(
-                    ["New name:", f"{after.name} | {after.id}"])
-            s.append(["Added Permissions", ", ".join(
-                a if len(a) != 0 else ["No added perms"]), False])
-            s.append(["Removed Permissions", ", ".join(
-                r if len(r) != 0 else ["No removed perms"])])
+        try:
+            if str(before.guild.id) in log:
+                async for entry in before.guild.audit_logs(limit=1, action=nextcord.AuditLogAction.role_update):
+                    entery = entry
+                if entry.target.id != before.id:
+                    return
+                print(before, after)
+                log_c = log[str(before.guild.id)]["role"]
+                r = [perm[0].replace(
+                    "_", " ").replace("guild", "server") for perm in before.permissions if perm not in after.permissions and perm[1]]
+                a = [perm[0].replace(
+                    "_", " ").replace("guild", "server") for perm in after.permissions if perm not in before.permissions and perm[1]]
+                s = []
+                if after.name == before.name:
+                    s.append(
+                        ["Role Name:", f"{before.name} | {before.id}"])
+                else:
+                    s.append(
+                        ["Old name:", f"{before.name} | {before.id}"])
+                    s.append(
+                        ["New name:", f"{after.name} | {after.id}"])
+                s.append(["Added Permissions", ", ".join(
+                    a if len(a) != 0 else ["No added perms"]), False])
+                s.append(["Removed Permissions", ", ".join(
+                    r if len(r) != 0 else ["No removed perms"])])
 
-            msg = {
-                "title": "Role edited",
-                "value": s}
+                msg = {
+                    "title": "Role edited",
+                    "value": s}
 
-            embed = msg_f(msg)
-            channel = await before.guild.fetch_channel(log_c)
-            await channel.send(embed=embed)
-            # role edited
+                embed = msg_f(msg)
+                channel = await before.guild.fetch_channel(log_c)
+                await channel.send(embed=embed)
+                # role edited
+        except AttributeError:
+            pass
 
     @ commands.guild_only()
     @ commands.Cog.listener()
