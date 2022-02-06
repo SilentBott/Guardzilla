@@ -25,17 +25,17 @@ class OnMessage(commands.Cog):
         if message.author.bot:
             return
         try:
-            with open("./blockedWords.json", ) as f:
+            with open("./blockedWords.json", "r") as f:
                 blocked_true, words = json.loads(
                     f.read())[str(message.guild.id)]
         except:
-            with open("./blockedWords.json", ) as f:
+            with open("./blockedWords.json", "r") as f:
                 o = json.loads(f.read())
             with open("./blockedWords.json", "w") as ff:
                 o.update(
                     {str(message.guild.id): [0, []]})
                 json.dump(o, ff)
-            with open("./blockedWords.json", ) as f:
+            with open("./blockedWords.json", "r") as f:
                 blocked_true, words = json.loads(
                     f.read())[str(message.guild.id)]
         if blocked_true:

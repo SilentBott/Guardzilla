@@ -8,6 +8,7 @@ class ShowBadWords(commands.Cog):
         self.client = client
 
     @commands.guild_only()
+    @commands.has_permissions(send_messages=True, manage_messages=True)
     @commands.command(name="show-bad-words")
     async def showbadwords(self, ctx):
         with open("./blockedWords.json", ) as f:

@@ -10,23 +10,25 @@ class RemoveBadWords(commands.Cog):
     @commands.guild_only()
     @commands.has_permissions(send_messages=True, manage_messages=True)
     @commands.command(name="remove-bad-words")
-    async def removebadwords(self, ctx, *, words):
+    async def removebadwords(self, ctx, *, bad_words):
         bad_word = False
         with open("./blockedWords.json", ) as f:
-            r = json.loads(f.read())
-        words = [i for i in str(words).split(" ")]
-        blocked_words = []
+            data = json.loads(f.read())
+        words, blocked_words = [], []
+        for i in range(len(str(bad_words).split('"'))//2):
+            words.append(str(bad_words).split('"')[i*2+1])
+
         for i in words:
-            if i in r[str(ctx.message.guild.id)][1]:
-                r[str(ctx.message.guild.id)][1].remove(i)
-                bad_word = True
+            if i in data[str(ctx.message.guild.id)][1]:
+                data[str(ctx.message.guild.id)][1].remove(i)
                 blocked_words.append(i)
-        if bad_word:
-            l = f"The bad words:\n{' | '.join(blocked_words)}\nRemoved!!"
+        if blocked_words:
+            l = f"Bad words:\n" + \
+                ' | '.join([f"`{x}`" for x in blocked_words]) + "\nremoved!!"
         else:
-            l = f"There isn't bad words with the names: \n{' | '.join(blocked_words)}\n"
+            l = f"There isn't bad words to remove"
         with open("./blockedWords.json", "w") as f:
-            json.dump(r, f)
+            json.dump(data, f)
         await ctx.send(l, delete_after=5)
 
 
