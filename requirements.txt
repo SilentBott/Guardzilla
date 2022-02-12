@@ -1,3 +1,4 @@
 nextcord
 nextcord-ext-menus
 pymongo
+pymongo[srv]
