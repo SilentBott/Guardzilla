@@ -1,6 +1,7 @@
 import json
 from nextcord.ext import commands
 import nextcord
+import pymongo
 
 
 class Warns(commands.Cog):
@@ -21,8 +22,12 @@ class Warns(commands.Cog):
                 member = member.split("<@")[1].split(">")[0].replace("!", "")
             member = await ctx.guild.fetch_member(member)
         embed = nextcord.Embed(color=0x00ff00)
-        with open("./warns.json", ) as f:
-            warnings = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        warns = cluster["warns"]
+        warnings = warns.find_one({"_id": 0})
+
         if str(ctx.guild.id) in warnings:
             if str(member.id) in warnings[str(ctx.guild.id)]:
                 embed.title = f"{len(warnings[str(ctx.guild.id)][str(member.id)])} Warnings"

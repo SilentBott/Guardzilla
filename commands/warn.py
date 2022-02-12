@@ -2,6 +2,7 @@ import json
 from nextcord.ext import commands
 import nextcord
 from datetime import datetime, timezone
+import pymongo
 
 
 class Warn(commands.Cog):
@@ -24,11 +25,20 @@ class Warn(commands.Cog):
             embed = nextcord.Embed(
                 color=0x00ff00, title="You cannot warn yourself")
             await ctx.send(embed=embed)
+            return
         embed = nextcord.Embed(color=0x00ff00)
-        with open("./warns.json", ) as f:
-            warnings = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        warns = cluster["warns"]
+        warnings = warns.find_one({"_id": 0})
+
         time = str(datetime.utcnow().replace(
             tzinfo=timezone.utc).strftime('%Y-%m-%d %H:%M:%S'))
+
+        if not warnings:
+            warns.insert_one({"_id": 0})
+            warnings = warns.find_one({"_id": 0})
         if str(ctx.guild.id) in warnings:
             if str(member.id) in warnings[str(ctx.guild.id)]:
                 warnings[str(ctx.guild.id)][str(member.id)].append(
@@ -41,8 +51,9 @@ class Warn(commands.Cog):
             warnings[str(ctx.guild.id)].update({str(member.id): []})
             warnings[str(ctx.guild.id)][str(member.id)].append(
                 [time, str(ctx.author.id), reason])
-        with open("./warns.json", "w") as f:
-            warnings = json.dump(warnings, f)
+        warns.delete_one({"_id": 0})
+        warns.insert_one(warnings)
+
         embed = nextcord.Embed(
             title=f"The member {member.display_name} | {member.id}\nwarned Reason:\n``` {reason} ```", color=0x00ff00)
         embed.set_footer(

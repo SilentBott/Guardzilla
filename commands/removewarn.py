@@ -1,6 +1,7 @@
 import json
 from nextcord.ext import commands
 import nextcord
+import pymongo
 
 
 class RemoveWarn(commands.Cog):
@@ -19,8 +20,12 @@ class RemoveWarn(commands.Cog):
         member = await ctx.guild.fetch_member(member)
 
         embed = nextcord.Embed(color=0x00ff00)
-        with open("./warns.json", ) as f:
-            warnings = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        warns = cluster["warns"]
+        warnings = warns.find_one({"_id": 0})
+
         if str(ctx.guild.id) in warnings:
             if str(member.id) in warnings[str(ctx.guild.id)]:
                 try:
@@ -31,8 +36,8 @@ class RemoveWarn(commands.Cog):
                         name=f"Removing the warn num {number}.\nFrom The user: {member.display_name} | {member.id}", value="_ _")
                     if not warnings[str(ctx.guild.id)][str(member.id)]:
                         warnings[str(ctx.guild.id)].pop(str(member.id))
-                    with open("./warns.json", 'w')as f:
-                        json.dump(warnings, f)
+                    warns.delete_one({"_id": 0})
+                    warns.insert_one(warnings)
                 except IndexError:
                     embed.add_field(
                         name=f"Wrong index.", value="_ _")

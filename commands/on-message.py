@@ -1,6 +1,7 @@
 import nextcord
 from nextcord.ext import commands, menus
 import json
+import pymongo
 
 
 def blocked(msg, words: list):
@@ -19,25 +20,24 @@ class OnMessage(commands.Cog):
     @commands.guild_only()
     @commands.Cog.listener()
     async def on_message(self, message):
-        # bad words
         if message.guild is None:
             return
         if message.author.bot:
             return
+        cluster = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")["Guardzilla"]
+        blockedWords = cluster["blockedwords"]
+        log = blockedWords.find_one({"_id": 0})
+        if not log:
+            blockedWords.insert_one({"_id": 0, str(message.guild.id): [0, []]})
+            log = blockedWords.find_one({"_id": 0})
         try:
-            with open("./blockedWords.json", "r") as f:
-                blocked_true, words = json.loads(
-                    f.read())[str(message.guild.id)]
+            blocked_true, words = log[str(message.guild.id)]
         except:
-            with open("./blockedWords.json", "r") as f:
-                o = json.loads(f.read())
-            with open("./blockedWords.json", "w") as ff:
-                o.update(
-                    {str(message.guild.id): [0, []]})
-                json.dump(o, ff)
-            with open("./blockedWords.json", "r") as f:
-                blocked_true, words = json.loads(
-                    f.read())[str(message.guild.id)]
+            log.update({str(message.guild.id): [0, []]})
+            blockedWords.delete_one({"_id": 0})
+            blockedWords.insert_one(log)
+            blocked_true, words = log[str(message.guild.id)]
         if blocked_true:
             if blocked(message, words):
                 await message.delete()
@@ -46,13 +46,14 @@ class OnMessage(commands.Cog):
                                            delete_after=5)
                 return
         # suggestion chat
-        with open("./suggestions.json", "r") as f:
-            channels = json.loads(f.read())
+        suggestions = cluster["suggestions"]
+        channels = suggestions.find_one({"_id": 0})
+        if not channels:
+            suggestions.insert_one({"_id": 0})
+            channels = suggestions.find_one({"_id": 0})
         if str(message.guild.id) in channels:
             if channels[str(message.guild.id)][0] == str(message.channel.id):
-                if str(message.content)[0] == 'r' and str(message.author.id) in ["821486817957642242", "714941410716942419", "574233135500492810", str(message.guild.owner.id)]:
-                    pass
-                else:
+                if str(message.content)[0] != 'r':
                     l = str("> " + str(message.content).replace('\n', "\n> "))
                     embed = nextcord.Embed(description=l, color=0x00ff00)
                     avatar_url = message.author.avatar.url
@@ -74,8 +75,9 @@ class OnMessage(commands.Cog):
                     await msg.add_reaction(emoji=uncheck)
                     channels[str(message.guild.id)][1][0].update(
                         {str(msg.id): [str(l), str(message.author.id)]})
-                    with open("./suggestions.json", "w") as f:
-                        json.dump(channels, f)
+
+                    suggestions.delete_one({"_id": 0})
+                    suggestions.insert_one(channels)
                     try:
                         await message.delete()
                     except:

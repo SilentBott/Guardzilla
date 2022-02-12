@@ -1,6 +1,7 @@
 from nextcord.ext import commands
 import nextcord
 from nextcord.utils import get
+import pymongo
 
 
 class UnMute(commands.Cog):

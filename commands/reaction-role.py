@@ -1,6 +1,8 @@
 import json
 from nextcord.ext import commands
 import nextcord
+import pymongo
+
 msgs = {}
 
 
@@ -17,11 +19,22 @@ class ReactionRole(commands.Cog):
         if ctx.author.top_role > role or ctx.author.id == ctx.guild.owner.id:
             msg = await ctx.fetch_message(msg_id)
             await msg.add_reaction(emoji=emoji)
-            with open("./reaction_roles.json", ) as f:
-                r = json.loads(f.read())
+
+            client = pymongo.MongoClient(
+                f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+            cluster = client["Guardzilla"]
+            reaction_roles = cluster["reaction_roles"]
+            r = reaction_roles.find_one({"_id": 0})
+            if not r:
+                reaction_roles.insert_one({"_id": 0})
+                r = prefix.find_one({"_id": 0})
+            if str(ctx.guild.id) not in r:
+                reaction_roles.insert_one({"_id": 0})
+                r = prefix.find_one({"_id": 0})
+
             r.update({str(msg_id): [int(emoji.id), int(role.id)]})
-            with open("./reaction_roles.json", "w") as f:
-                json.dump(r, f)
+            reaction_roles.delete_one({"_id": 0})
+            reaction_roles.insert_one(r)
 
 
 def setup(client):

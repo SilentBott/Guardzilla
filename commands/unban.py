@@ -1,4 +1,5 @@
 from nextcord.ext import commands
+import pymongo
 
 
 class Unban(commands.Cog):

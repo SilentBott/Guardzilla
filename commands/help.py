@@ -1,12 +1,22 @@
 import nextcord
 from nextcord.ext import commands, menus
 import json
+import pymongo
 
 
 def bot_admin(ctx):
-    with open("./bot_admin.json", ) as f:
-        is_admin = str(ctx.message.author.id) in json.loads(
-            f.read())["Admins"][0]
+    cluster = pymongo.MongoClient(
+        f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")["Guardzilla"]
+    bot_admin = cluster["bot_admin"]
+    r = bot_admin.find_one({"_id": 0})
+    if not r:
+        bot_admin.insert_one({"_id": 0, "Admins": ["821486817957642242"]})
+        r = bot_admin.find_one({"_id": 0})
+    if str(ctx.guild.id) not in r:
+        bot_admin.delete_one({"_id": 0})
+        bot_admin.insert_one({"_id": 0, "Admins": ["821486817957642242"]})
+        r = bot_admin.find_one({"_id": 0})
+    is_admin = str(ctx.message.author.id) in r["Admins"]
     return is_admin
 
 
@@ -18,10 +28,48 @@ class MyPageSource(menus.ListPageSource):  # menus.ButtonMenuPages
         # self._disable_unavailable_buttons()
 
     async def format_page(self, menu: menus.ButtonMenuPages, entries):
-        with open("./commands.json", ) as f:
-            data = json.loads(f.read())[entries[0]]
-        with open("./prefix.json", ) as f:
-            prefix = json.loads(f.read())[entries[1]]
+        cluster = pymongo.MongoClient(
+        f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")["Guardzilla"]
+        prefix = cluster["prefix"].find_one({"_id": 0})[entries[1]]
+        data = {
+            "Home": [{}, "", ""],
+
+            "General Commands": [{
+                "ticket": ["", "to make tickets", "", ["prefix-ticket"], ""]
+            }, "", "To show General Commands"],
+
+            "Admin Commands": [{
+                "kick": ["<member> [reason]", "to kick someone", "Kick members perms", [], "922786678454771742"],
+                "ban": ["<member> [reason]", "to ban someone", "Ban members perms", [], "922790457556226078"],
+                "unban": ["<member>", "to unban someone", "Ban members perms", [], ""],
+                "add-bad-words": ["[words]", "to make reaction that if any one pressed it will get role", "manage messages perms", ["prefix-add-bad-words f*** trash"], ""],
+                "remove-bad-words": ["[words]", "to remove the bad words in the list", "manage messages perms", ["prefix-remove-bad-words f*** trash"], ""],
+                "clear": ["<number> <member> <channel>", "to clear messages in a channel / to clear messages from someone only in the last 100 msg on each channel", "manage messages perms", ["prefix-clear 1", "prefix-clear 20"], ""],
+                "mute": ["<member>", "to make someone unable to send messages in text channels", "manage messages perms", [], ""],
+                "unmute": ["<member>", "to Cancel the effect of the mute command", "manage messages perms", [], ""],
+                "hide": ["<channel>", "Make any channel unvisible to normal people", "manage messages perms", ["prefix-hide room-mention", "prefix-show room-id"], ""],
+                "show": ["<channel>", "Make any channel visible to normal people", "manage messages perms", ["prefix-show room-mention", "prefix-show room-id"], ""],
+                "nick": ["<member> [nick name]", "to change member nickname", "manage nicknames perms", ["prefix-nick member-id Awsome person"], ""],
+                "embed": ["[phrase]", "to make reaction that if any one pressed it will get role", "manage messages perms", ["prefix-embed Hi all"], ""],
+                "warn": ["<member> [reason]", "to warn someone", "manage messages perms", ["prefix-warn member-id", "prefix-warn member-mention cuz i hate him/her"], ""],
+                "removewarn": ["<member> <number>", "to remove warn from someone", "manage messages perms", ["prefix-removewarn member-id 1", "prefix-warn member-mention 2"], ""],
+                "show-bad-words": ["", "to show bad words list", "", ["prefix-show-bad-words"], ""]
+
+            }, "", "To show Admin Commands"],
+            "Server admin commands": [{
+                "set-prefix": ["<prefix>", "to change server prefix", "manage messages perms", ["prefix-set-prefix -", "prefix-set-prefix #"], ","],
+                "chat-filter": ["<true / false>", "enable/disable the chat filter (delete bad words)", "manage messages perms", ["prefix-chat-filter Enable", "prefix-chat-filter Disable"], ""],
+                "suggest-room": ["<Text channel>", "to make room for suggestion", "manage messages perms", ["prefix-suggest-room", "prefix-suggest-room room-mention", "prefix-suggest-room room-id"], ""],
+                "reaction-role": ["<message id> <custom emoji> <role>", "to put reaction and make anyone click it it get the role", "manage roles perms", ["prefix-reaction-role msg-id emoji- role-"], ""]
+
+            }, "", "To show Admin Commands"],
+
+            "Bot Admin Commands": [{
+                "load": ["<cog name>", "to load cog", "You need to be: The Bot developer", ["prefix-load kick", "prefix-load ban"], ""],
+                "unload": ["<cog name>", "to unload cog", "You need to be: The Bot developer", ["prefix-unload kick", "prefix-unload ban"], ""],
+                "reload": ["<cog name>", "to reload cog", "You need to be: The Bot developer", ["prefix-reload kick", "prefix-reload ban"], ""]
+            }, "", "To show Bot Admin Commands"]
+        }
         if entries[0] == "Home":
             embed = nextcord.Embed(color=0xA020F0)
             embed.add_field(name=f"Welcome to Guardzilla",
@@ -35,8 +83,8 @@ class MyPageSource(menus.ListPageSource):  # menus.ButtonMenuPages
             embed = nextcord.Embed(
                 title="Guardzilla's commands", color=0xA020F0)
             msg = ""
-            for i in data[0]:
-                msg += f"> `{prefix}{i}` | {data[0][i][1]}\n"
+            for i in data[entries[0]][0]:
+                msg += f"> `{prefix}{i}` | {data[entries[0]][0][i][1]}\n"
             embed.add_field(name=f"**{entries[0]}**", value=msg, inline=False)
         embed.set_footer(
             text=f'Page {menu.current_page + 1}/{self.get_max_pages()}')
@@ -51,8 +99,50 @@ class General(commands.Cog):
     @commands.command()
     async def help(self, ctx, help_c=None):
         if help_c is None:
-            with open("./commands.json", ) as f:
-                r = json.loads(f.read())
+            client = pymongo.MongoClient(
+        f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+            cluster = client["Guardzilla"]
+            commands = cluster["commands"]
+            r = {
+                "Home": [{}, "", ""],
+
+                "General Commands": [{
+                    "ticket": ["", "to make tickets", "", ["prefix-ticket"], ""]
+                }, "", "To show General Commands"],
+
+                "Admin Commands": [{
+                    "kick": ["<member> [reason]", "to kick someone", "Kick members perms", [], "922786678454771742"],
+                    "ban": ["<member> [reason]", "to ban someone", "Ban members perms", [], "922790457556226078"],
+                    "unban": ["<member>", "to unban someone", "Ban members perms", [], ""],
+                    "add-bad-words": ["[words]", "to make reaction that if any one pressed it will get role", "manage messages perms", ["prefix-add-bad-words f*** trash"], ""],
+                    "remove-bad-words": ["[words]", "to remove the bad words in the list", "manage messages perms", ["prefix-remove-bad-words f*** trash"], ""],
+                    "clear": ["<number> <member> <channel>", "to clear messages in a channel / to clear messages from someone only in the last 100 msg on each channel", "manage messages perms", ["prefix-clear 1", "prefix-clear 20"], ""],
+                    "mute": ["<member>", "to make someone unable to send messages in text channels", "manage messages perms", [], ""],
+                    "unmute": ["<member>", "to Cancel the effect of the mute command", "manage messages perms", [], ""],
+                    "hide": ["<channel>", "Make any channel unvisible to normal people", "manage messages perms", ["prefix-hide room-mention", "prefix-show room-id"], ""],
+                    "show": ["<channel>", "Make any channel visible to normal people", "manage messages perms", ["prefix-show room-mention", "prefix-show room-id"], ""],
+                    "nick": ["<member> [nick name]", "to change member nickname", "manage nicknames perms", ["prefix-nick member-id Awsome person"], ""],
+                    "embed": ["[phrase]", "to make reaction that if any one pressed it will get role", "manage messages perms", ["prefix-embed Hi all"], ""],
+                    "warn": ["<member> [reason]", "to warn someone", "manage messages perms", ["prefix-warn member-id", "prefix-warn member-mention cuz i hate him/her"], ""],
+                    "removewarn": ["<member> <number>", "to remove warn from someone", "manage messages perms", ["prefix-removewarn member-id 1", "prefix-warn member-mention 2"], ""],
+                    "show-bad-words": ["", "to show bad words list", "", ["prefix-show-bad-words"], ""]
+
+                }, "", "To show Admin Commands"],
+                "Server admin commands": [{
+                    "set-prefix": ["<prefix>", "to change server prefix", "manage messages perms", ["prefix-set-prefix -", "prefix-set-prefix #"], ","],
+                    "chat-filter": ["<true / false>", "enable/disable the chat filter (delete bad words)", "manage messages perms", ["prefix-chat-filter Enable", "prefix-chat-filter Disable"], ""],
+                    "suggest-room": ["<Text channel>", "to make room for suggestion", "manage messages perms", ["prefix-suggest-room", "prefix-suggest-room room-mention", "prefix-suggest-room room-id"], ""],
+                    "reaction-role": ["<message id> <custom emoji> <role>", "to put reaction and make anyone click it it get the role", "manage roles perms", ["prefix-reaction-role msg-id emoji- role-"], ""]
+
+                }, "", "To show Admin Commands"],
+
+                "Bot Admin Commands": [{
+                    "load": ["<cog name>", "to load cog", "You need to be: The Bot developer", ["prefix-load kick", "prefix-load ban"], ""],
+                    "unload": ["<cog name>", "to unload cog", "You need to be: The Bot developer", ["prefix-unload kick", "prefix-unload ban"], ""],
+                    "reload": ["<cog name>", "to reload cog", "You need to be: The Bot developer", ["prefix-reload kick", "prefix-reload ban"], ""]
+                }, "", "To show Bot Admin Commands"]
+            }
+
             category = [x for x in r][:-1 if not bot_admin(ctx) else None]
             channel_ids = [str(ctx.message.guild.id)] * \
                 len([x for x in r][:-1 if not bot_admin(ctx) else None])
@@ -69,19 +159,56 @@ class General(commands.Cog):
                 command = help_c
                 prefix = str(ctx.message.content).split(
                     " ")[0].replace("help", "")
-                with open("./commands.json", ) as f:
-                    r = json.loads(f.read())
-                    r = r if bot_admin(ctx) else r[:-2]
-                    cm = {}
-                    for i in r:
-                        for ii in r[i][0]:
-                            if i != "Home":
-                                cm.update({str(ii): list(r[i][0][ii])})
-                    cm = cm[command]
-                    usage = cm[0]
-                    description = cm[1]
-                    needing = cm[2]
-                    examples = cm[3]
+                r = {
+                    "Home": [{}, "", ""],
+
+                    "General Commands": [{
+                        "ticket": ["", "to make tickets", "", ["prefix-ticket"], ""]
+                    }, "", "To show General Commands"],
+
+                    "Admin Commands": [{
+                        "kick": ["<member> [reason]", "to kick someone", "Kick members perms", [], "922786678454771742"],
+                        "ban": ["<member> [reason]", "to ban someone", "Ban members perms", [], "922790457556226078"],
+                        "unban": ["<member>", "to unban someone", "Ban members perms", [], ""],
+                        "add-bad-words": ["[words]", "to make reaction that if any one pressed it will get role", "manage messages perms", ["prefix-add-bad-words f*** trash"], ""],
+                        "remove-bad-words": ["[words]", "to remove the bad words in the list", "manage messages perms", ["prefix-remove-bad-words f*** trash"], ""],
+                        "clear": ["<number> <member> <channel>", "to clear messages in a channel / to clear messages from someone only in the last 100 msg on each channel", "manage messages perms", ["prefix-clear 1", "prefix-clear 20"], ""],
+                        "mute": ["<member>", "to make someone unable to send messages in text channels", "manage messages perms", [], ""],
+                        "unmute": ["<member>", "to Cancel the effect of the mute command", "manage messages perms", [], ""],
+                        "hide": ["<channel>", "Make any channel unvisible to normal people", "manage messages perms", ["prefix-hide room-mention", "prefix-show room-id"], ""],
+                        "show": ["<channel>", "Make any channel visible to normal people", "manage messages perms", ["prefix-show room-mention", "prefix-show room-id"], ""],
+                        "nick": ["<member> [nick name]", "to change member nickname", "manage nicknames perms", ["prefix-nick member-id Awsome person"], ""],
+                        "embed": ["[phrase]", "to make reaction that if any one pressed it will get role", "manage messages perms", ["prefix-embed Hi all"], ""],
+                        "warn": ["<member> [reason]", "to warn someone", "manage messages perms", ["prefix-warn member-id", "prefix-warn member-mention cuz i hate him/her"], ""],
+                        "removewarn": ["<member> <number>", "to remove warn from someone", "manage messages perms", ["prefix-removewarn member-id 1", "prefix-warn member-mention 2"], ""],
+                        "show-bad-words": ["", "to show bad words list", "", ["prefix-show-bad-words"], ""]
+
+                    }, "", "To show Admin Commands"],
+                    "Server admin commands": [{
+                        "set-prefix": ["<prefix>", "to change server prefix", "manage messages perms", ["prefix-set-prefix -", "prefix-set-prefix #"], ","],
+                        "chat-filter": ["<true / false>", "enable/disable the chat filter (delete bad words)", "manage messages perms", ["prefix-chat-filter Enable", "prefix-chat-filter Disable"], ""],
+                        "suggest-room": ["<Text channel>", "to make room for suggestion", "manage messages perms", ["prefix-suggest-room", "prefix-suggest-room room-mention", "prefix-suggest-room room-id"], ""],
+                        "reaction-role": ["<message id> <custom emoji> <role>", "to put reaction and make anyone click it it get the role", "manage roles perms", ["prefix-reaction-role msg-id emoji- role-"], ""]
+
+                    }, "", "To show Admin Commands"],
+
+                    "Bot Admin Commands": [{
+                        "load": ["<cog name>", "to load cog", "You need to be: The Bot developer", ["prefix-load kick", "prefix-load ban"], ""],
+                        "unload": ["<cog name>", "to unload cog", "You need to be: The Bot developer", ["prefix-unload kick", "prefix-unload ban"], ""],
+                        "reload": ["<cog name>", "to reload cog", "You need to be: The Bot developer", ["prefix-reload kick", "prefix-reload ban"], ""]
+                    }, "", "To show Bot Admin Commands"]
+                }
+                r = r if bot_admin(ctx) else r[:-2]
+                cm = {}
+                for i in r:
+                    for ii in r[i][0]:
+                        if i != "Home":
+                            cm.update({str(ii): list(r[i][0][ii])})
+                cm = cm[command]
+                usage = cm[0]
+                description = cm[1]
+                needing = cm[2]
+                examples = cm[3]
                 if bool(examples):
                     emm = self.client.get_emoji(922791127516598312)
                     example_val = f"\n".join([x.replace("prefix-", prefix).replace("member-mention", ctx.author.mention).
@@ -105,58 +232,6 @@ class General(commands.Cog):
                 await ctx.reply(embed=embedVar)
             except KeyError:
                 await ctx.reply("There isn't any command like that")
-
-
-"""
-        with open("./commands.json") as f:
-            bot_commands = json.loads(f.read())
-            if not bot_admin(ctx):
-                bot_commands.pop("Bot Admin Commands")
-        if ctx.message.guild:
-            with open("prefix.json", ) as file:
-                prefix_x = json.loads(file.read())
-            prefix = prefix_x[str(ctx.message.guild.id)]
-        else:
-            prefix = '!'
-        embed = nextcord.Embed(color=0x00ff00)
-        embed.set_author(name="Press the menu below to show help menu", icon_url=self.client.user.avatar_url)
-        embed.add_field(name=f"The bot Latency is: {round(self.client.latency * 1000)}ms", value=f"_ _", inline=False)
-        embed.set_thumbnail(url=self.client.user.avatar_url)
-        options = []
-        ans = {}
-        for i in bot_commands:
-            embed_d = nextcord.Embed(color=0x00ff00)
-            embed_d.set_author(name=f"{i}", icon_url=self.client.user.avatar_url)
-            embed_d.set_thumbnail(url=self.client.user.avatar_url)
-            for ii in bot_commands[i][0]:
-                embed_d.add_field(name="_ _", value=f"``{prefix}{ii}`` | {bot_commands[i][0][ii][1]}", inline=False)
-            ans.update({i: embed_d})
-            options.append(SelectOption(label=i,
-                                 value=i,
-                                 emoji=self.client.get_emoji(int(bot_commands[i][1]) if bot_commands[i][1] != "" else 922787663352840203),
-                                description=bot_commands[i][2]))
-
-        msg = await ctx.send(embed=embed, components=[Select(
-                placeholder="Click here to view the help menu!",
-                options=options,
-                custom_id="SelectTesting"
-
-
-            )])
-
-        def check(ctx_x):
-            if ctx_x.custom_id == "SelectTesting" and ctx_x.user == ctx_x.author and ctx_x.message.id == msg.id:
-                return
-        for i in range(100):
-            interaction = await self.client.wait_for("select_option",
-             check=lambda ctx_x: ctx_x.custom_id == "SelectTesting" and ctx_x.user == ctx_x.author and ctx_x.message.id == msg.id)
-            val = ans[interaction.values[0]] if interaction.values[0] not in ["Home page"]else embed
-            await msg.edit(embed=val)
-            try:
-                await interaction.respond()
-            except:
-                pass
-"""
 
 
 def setup(client):

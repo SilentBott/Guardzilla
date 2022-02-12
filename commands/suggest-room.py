@@ -1,6 +1,7 @@
 import json
 from nextcord.ext import commands
 import nextcord
+import pymongo
 
 
 class SuggestRoom(commands.Cog):
@@ -19,8 +20,12 @@ class SuggestRoom(commands.Cog):
         except ValueError:
             channel = channel.split("<#")[1].split(">")[0]
         channel = await ctx.guild.fetch_channel(str(channel))
-        with open("./suggestions.json", ) as f:
-            sug = json.loads(f.read())
+
+        cluster = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")["Guardzilla"]
+        suggestions = cluster["suggestions"]
+        sug = suggestions.find_one({"_id": 0})
+
         if str(ctx.guild.id) in sug:
             if sug[str(ctx.guild.id)][0] == str(channel.id):
                 pass
@@ -34,8 +39,9 @@ class SuggestRoom(commands.Cog):
             embed = nextcord.Embed(description=f"This channel {channel.mention} will be the suggestion room.",
                                    color=0x00ff00)
             await ctx.send(embed=embed)
-        with open("./suggestions.json", "w") as f:
-            json.dump(sug, f)
+
+        suggestions.delete_one({"_id": 0})
+        suggestions.insert_one(sug)
         await ctx.message.delete()
 
 

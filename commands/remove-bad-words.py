@@ -1,5 +1,6 @@
 from nextcord.ext import commands
 import json
+import pymongo
 
 
 class RemoveBadWords(commands.Cog):
@@ -12,8 +13,10 @@ class RemoveBadWords(commands.Cog):
     @commands.command(name="remove-bad-words")
     async def removebadwords(self, ctx, *, bad_words):
         bad_word = False
-        with open("./blockedWords.json", ) as f:
-            data = json.loads(f.read())
+        cluster = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")["Guardzilla"]
+        blockedWords = cluster["blockedwords"]
+        data = blockedWords.find_one({"_id": 0})
         words, blocked_words = [], []
         for i in range(len(str(bad_words).split('"'))//2):
             words.append(str(bad_words).split('"')[i*2+1])
@@ -27,8 +30,8 @@ class RemoveBadWords(commands.Cog):
                 ' | '.join([f"`{x}`" for x in blocked_words]) + "\nremoved!!"
         else:
             l = f"There isn't bad words to remove"
-        with open("./blockedWords.json", "w") as f:
-            json.dump(data, f)
+        blockedWords.delete_one({"_id": 0})
+        blockedWords.insert_one(data)
         await ctx.send(l, delete_after=5)
 
 

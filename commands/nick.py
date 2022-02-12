@@ -1,5 +1,6 @@
 from nextcord.ext import commands
 import nextcord
+import pymongo
 
 
 class Nick(commands.Cog):
@@ -30,8 +31,12 @@ class Nick(commands.Cog):
                 dn = member.display_name
                 n = member.name
                 await member.edit(nick=member.name)
-                embed.set_author(
-                    name=f"Member: {member.name}\nNickname reset: to '{member.name}'", url=member.avatar.url)
+                if member.avatar:
+                    embed.set_author(
+                        name=f"Member: {member.name}\nNickname reset: to '{member.name}'", url=member.avatar.url)
+                else:
+                    embed.set_author(
+                        name=f"Member: {member.name}\nNickname reset: to '{member.name}'")
         else:
             if member.display_name == nick:
                 embed.set_author(
@@ -44,12 +49,19 @@ class Nick(commands.Cog):
                     name="Member: {member.mention}\nReset its name: `{dn.name}`", url=member.avatar.url)
 
             else:
-                embed.set_author(
-                    name="This is the member nickname ", url=member.avatar.url)
+                if member.avatar:
+                    embed.set_author(
+                        name="This is the member nickname ", url=member.avatar.url)
+                else:
+                    embed.set_author(name="This is the member nickname ")
                 dn = member.display_name
                 await member.edit(nick=nick)
-                embed.set_author(
-                    name=f"Nick name changed\nFrom: {dn} to: `{nick}`", url=member.avatar.url)
+                if member.avatar:
+                    embed.set_author(
+                        name=f"Nick name changed\nFrom: {dn} to: `{nick}`", url=member.avatar.url)
+                else:
+                    embed.set_author(
+                        name=f"Nick name changed\nFrom: {dn} to: `{nick}`")
         await ctx.send(embed=embed)
 
 

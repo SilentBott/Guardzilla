@@ -12,7 +12,8 @@ class Ping(commands.Cog):
     async def ping(self, ctx):
         embed = nextcord.Embed(
             title=f"Pong!", description=f"Bot Latency:\n{round(self.client.latency * 1000)}ms", color=0x00ff00)
-        embed.set_thumbnail(url=self.client.user.avatar.url)
+        if self.client.user.avatar:
+            embed.set_thumbnail(url=self.client.user.avatar.url)
         await ctx.send(embed=embed)
 
 

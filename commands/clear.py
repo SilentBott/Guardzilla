@@ -1,8 +1,6 @@
 import nextcord
 from nextcord.ext import commands
 import json
-with open("blockedWords.json", ) as f:
-    guild_ids = [int(i) for i in json.loads(f.read())]
 
 
 class Clear(commands.Cog):
@@ -11,7 +9,6 @@ class Clear(commands.Cog):
         self.client = client
 
     @commands.guild_only()
-    @commands.bot_has_permissions(send_messages=True, manage_messages=True)
     @commands.has_permissions(send_messages=True, manage_messages=True)
     @commands.command(name="clear")
     async def clear(self, ctx, num: int, member=None, channel=None):

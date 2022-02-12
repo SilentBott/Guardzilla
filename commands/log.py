@@ -2,6 +2,7 @@ from nextcord.ext import commands
 import nextcord
 import json
 from datetime import datetime, timezone, date
+import pymongo
 
 
 def msg_f(msg: dict):
@@ -28,8 +29,17 @@ class Log(commands.Cog):
     @commands.has_permissions(send_messages=True, manage_messages=True)
     @commands.command()
     async def log(self, ctx, i=None):
-        with open("./logs.json", ) as f:
-            r = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        logs = cluster["logs"]
+        r = logs.find_one({"_id": 0})
+        if not log:
+            logs.insert_one({"_id": 0})
+            r = prefix.find_one({"_id": 0})
+        if str(message.guild.id) not in log:
+            logs.insert_one({"_id": 0})
+            r = prefix.find_one({"_id": 0})
 
         overwrites = {
             ctx.guild.default_role: nextcord.PermissionOverwrite(read_messages=False, send_messages=False),
@@ -72,8 +82,10 @@ class Log(commands.Cog):
                     "channel": channelsL.id,
                     "member": memberL.id
                 }})
-        with open("./logs.json", "w") as f:
-            json.dump(r, f)
+
+        logs.delete_one({"_id": 0})
+        log.insert_one(r)
+
         embed = nextcord.Embed(
             title="", description="LOG category and its channels\nCreated", color=0x00ff00)
         await ctx.send(embed=embed)
@@ -82,8 +94,23 @@ class Log(commands.Cog):
     async def on_message_edit(self, before, after):
         if after.author.bot:
             return
-        with open("./logs.json", ) as f:
-            log = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        logs = cluster["logs"]
+        log = logs.find_one({"_id": 0})
+        if not log:
+            logs.insert_one({"_id": 0})
+            log = prefix.find_one({"_id": 0})
+
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        logs = cluster["logs"]
+        log = logs.find_one({"_id": 0})
+        if not log:
+            logs.insert_one({"_id": 0})
+            log = prefix.find_one({"_id": 0})
         try:
             if str(before.guild.id) in log:
                 log_c = log[str(before.guild.id)]["chat"]
@@ -108,8 +135,14 @@ class Log(commands.Cog):
     async def on_message_delete(self, message):
         async for entry in message.guild.audit_logs(limit=1, action=nextcord.AuditLogAction.message_delete):
             deleter = entry.user
-        with open("./logs.json", ) as f:
-            log = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        logs = cluster["logs"]
+        log = logs.find_one({"_id": 0})
+        if not log:
+            logs.insert_one({"_id": 0})
+            log = prefix.find_one({"_id": 0})
         if str(message.guild.id) in log:
             log_c = log[str(message.guild.id)]["chat"]
             if message.content == "":
@@ -143,8 +176,14 @@ class Log(commands.Cog):
     @commands.guild_only()
     @commands.Cog.listener()
     async def on_member_join(self, member):
-        with open("./logs.json", ) as f:
-            log = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        logs = cluster["logs"]
+        log = logs.find_one({"_id": 0})
+        if not log:
+            logs.insert_one({"_id": 0})
+            log = prefix.find_one({"_id": 0})
         if str(member.guild.id) in log:
             log_c = log[str(member.guild.id)]["member"]
             embed = msg_f({
@@ -158,8 +197,14 @@ class Log(commands.Cog):
     @commands.Cog.listener()
     async def on_member_remove(self, member):
         now = datetime.now(timezone.utc)
-        with open("./logs.json", ) as f:
-            log = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        logs = cluster["logs"]
+        log = logs.find_one({"_id": 0})
+        if not log:
+            logs.insert_one({"_id": 0})
+            log = prefix.find_one({"_id": 0})
         if str(member.guild.id) in log:
             async for entry in member.guild.audit_logs(limit=1, action=nextcord.AuditLogAction.kick):
                 entery = entry
@@ -176,9 +221,6 @@ class Log(commands.Cog):
                         ["Reason:", f"{entery.reason}", False]]})
                 channel = await member.guild.fetch_channel(log_c)
                 await channel.send(embed=embed)
-            # https://discord.gg/DTTjYmeC
-            # time_elapsed = entery.created_at.timestamp() - date_time
-            # print(time_elapsed)
             elif enteryy:
                 return
             else:
@@ -195,8 +237,14 @@ class Log(commands.Cog):
     @commands.guild_only()
     @commands.Cog.listener()
     async def on_member_update(self, before, after):
-        with open("./logs.json", ) as f:
-            log = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        logs = cluster["logs"]
+        log = logs.find_one({"_id": 0})
+        if not log:
+            logs.insert_one({"_id": 0})
+            log = prefix.find_one({"_id": 0})
         try:
             if str(before.guild.id) in log:  # nickname changed
                 if before.display_name != after.display_name:
@@ -245,8 +293,14 @@ class Log(commands.Cog):
     async def on_user_update(self, before, after):
         if after.bot:
             return
-        with open("./logs.json", ) as f:
-            r = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        logs = cluster["logs"]
+        log = logs.find_one({"_id": 0})
+        if not log:
+            logs.insert_one({"_id": 0})
+            log = prefix.find_one({"_id": 0})
         try:
             if str(before.guild.id) in log:
                 if before.name != after.name:
@@ -285,8 +339,14 @@ class Log(commands.Cog):
     @commands.guild_only()
     @commands.Cog.listener()
     async def on_guild_role_create(self, role):
-        with open("./logs.json", ) as f:
-            log = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        logs = cluster["logs"]
+        log = logs.find_one({"_id": 0})
+        if not log:
+            logs.insert_one({"_id": 0})
+            log = prefix.find_one({"_id": 0})
         if str(role.guild.id) in log:
             log_c = log[str(role.guild.id)]["role"]
             async for entry in role.guild.audit_logs(limit=1, action=nextcord.AuditLogAction.role_create):
@@ -304,8 +364,14 @@ class Log(commands.Cog):
     @commands.guild_only()
     @commands.Cog.listener()
     async def on_guild_role_delete(self, role):
-        with open("./logs.json", ) as f:
-            log = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        logs = cluster["logs"]
+        log = logs.find_one({"_id": 0})
+        if not log:
+            logs.insert_one({"_id": 0})
+            log = prefix.find_one({"_id": 0})
         if str(role.guild.id) in log:
             log_c = log[str(role.guild.id)]["role"]
             async for entry in role.guild.audit_logs(limit=1, action=nextcord.AuditLogAction.role_delete):
@@ -321,8 +387,14 @@ class Log(commands.Cog):
 
     @commands.Cog.listener()
     async def on_guild_role_update(self, before, after):
-        with open("./logs.json", ) as f:
-            log = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        logs = cluster["logs"]
+        log = logs.find_one({"_id": 0})
+        if not log:
+            logs.insert_one({"_id": 0})
+            log = prefix.find_one({"_id": 0})
         try:
             if str(before.guild.id) in log:
                 async for entry in before.guild.audit_logs(limit=1, action=nextcord.AuditLogAction.role_update):
@@ -363,8 +435,14 @@ class Log(commands.Cog):
     @ commands.guild_only()
     @ commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
-        with open("./logs.json", ) as f:
-            log = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        logs = cluster["logs"]
+        log = logs.find_one({"_id": 0})
+        if not log:
+            logs.insert_one({"_id": 0})
+            log = prefix.find_one({"_id": 0})
         check_l = None
         if before.channel is None:
             check_l = after.channel
@@ -395,8 +473,14 @@ class Log(commands.Cog):
     @ commands.guild_only()
     @ commands.Cog.listener()
     async def on_member_ban(self, guild, user):
-        with open("./logs.json", ) as f:
-            log = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        logs = cluster["logs"]
+        log = logs.find_one({"_id": 0})
+        if not log:
+            logs.insert_one({"_id": 0})
+            log = prefix.find_one({"_id": 0})
         if str(guild.id) in log:
             async for entry in guild.audit_logs(limit=1, action=nextcord.AuditLogAction.ban):
                 entery = entry
@@ -416,8 +500,14 @@ class Log(commands.Cog):
     @ commands.guild_only()
     @ commands.Cog.listener()
     async def on_member_unban(self, guild, user):
-        with open("./logs.json", ) as f:
-            log = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        logs = cluster["logs"]
+        log = logs.find_one({"_id": 0})
+        if not log:
+            logs.insert_one({"_id": 0})
+            log = prefix.find_one({"_id": 0})
         if str(guild.id) in log:
             async for entry in guild.audit_logs(limit=1, action=nextcord.AuditLogAction.unban):
                 entery = entry
@@ -434,8 +524,14 @@ class Log(commands.Cog):
     @ commands.guild_only()
     @ commands.Cog.listener()
     async def on_guild_channel_create(self, channel):
-        with open("./logs.json", ) as f:
-            log = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        logs = cluster["logs"]
+        log = logs.find_one({"_id": 0})
+        if not log:
+            logs.insert_one({"_id": 0})
+            log = prefix.find_one({"_id": 0})
         if str(channel.guild.id) in log:
             async for entry in channel.guild.audit_logs(limit=1, action=nextcord.AuditLogAction.channel_create):
                 entery = entry
@@ -449,33 +545,17 @@ class Log(commands.Cog):
             channell = await channel.guild.fetch_channel(log_c)
             await channell.send(embed=embed)
 
-    '''# @ commands.guild_only()
-    # @ commands.Cog.listener()
-    async def on_guild_channel_update(self, before, after):
-        with open("./logs.json", ) as f:
-            log = json.loads(f.read())
-        if str(before.guild.id) in log:
-            async for entry in before.guild.audit_logs(limit=1, action=nextcord.AuditLogAction.overwrite_update):
-                entery = entry
-            if entry.target.id != before.id:
-                return
-            log_c = log[str(before.guild.id)]["channel"]
-            channell = await before.guild.fetch_channel(log_c)
-            before_perms = {}
-            after_perms = {}
-            print(entery.changes)
-            print(entery.changes.before)
-            print(entery.changes.after)
-            # l.update({iii[0]: iii[1]})
-            # after_perms.update({str(i.id): l})
-            # await channell.send(before_perms)
-            # await channell.send(after_perms)'''
-
     @ commands.guild_only()
     @ commands.Cog.listener()
     async def on_guild_channel_delete(self, channel):
-        with open("./logs.json", ) as f:
-            log = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        logs = cluster["logs"]
+        log = logs.find_one({"_id": 0})
+        if not log:
+            logs.insert_one({"_id": 0})
+            log = prefix.find_one({"_id": 0})
         if str(channel.guild.id) in log:
             async for entry in channel.guild.audit_logs(limit=1, action=nextcord.AuditLogAction.channel_create):
                 entery = entry

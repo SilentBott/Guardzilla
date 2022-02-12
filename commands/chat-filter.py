@@ -1,5 +1,6 @@
 from nextcord.ext import commands
 import json
+import pymongo
 
 
 class Admin(commands.Cog):
@@ -11,8 +12,18 @@ class Admin(commands.Cog):
     @commands.has_permissions(send_messages=True, manage_messages=True)
     @commands.command(name="chat-filter")
     async def chatfilter(self, ctx, allowed):
-        with open("./blockedWords.json", ) as f:
-            r = json.loads(f.read())
+        client = pymongo.MongoClient(
+        f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        blockedwords = cluster["blockedwords"]
+        r = blockedwords.find_one({"_id": 0})
+        if not r:
+            blockedwords.insert_one({"_id": 0, str(ctx.guild.id): [0, []]})
+            r = prefix.find_one({"_id": 0})
+        if str(ctx.guild.id) not in r:
+            blockedwords.insert_one({"_id": 0, str(ctx.guild.id): [0, []]})
+            r = prefix.find_one({"_id": 0})
+
         is_allowed = r[str(ctx.guild.id)][0]
         allowed = allowed[0].lower()
         if allowed in ["d", "a", '1', '0', 't', 'f']:
@@ -23,9 +34,9 @@ class Admin(commands.Cog):
             if allowed == is_allowed:
                 await ctx.reply(f"The chat filter is already set to: {'allowed' if allowed else 'disabled'} mode")
             else:
-                with open("./blockedWords.json", "w") as f:
-                    r[str(ctx.guild.id)][0] = allowed
-                    json.dump(r, f)
+                r[str(ctx.guild.id)][0] = allowed
+                blockedwords.delete_one({"_id": 0})
+                blockedwords.insert_one(r)
                 await ctx.reply(f"The chat filter set to: {'allowed' if allowed else 'disabled'} mode")
         else:
             await ctx.reply("")

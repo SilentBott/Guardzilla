@@ -2,6 +2,7 @@ from nextcord.ext import commands
 import json
 from nextcord.utils import get
 import nextcord
+import pymongo
 
 
 class OnReaction(commands.Cog):
@@ -14,16 +15,36 @@ class OnReaction(commands.Cog):
     async def on_raw_reaction_add(self, payload):
         if payload.member.bot:
             return
-        with open("./reaction_roles.json", ) as f:
-            r = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        reaction_roles = cluster["reaction_roles"]
+        r = reaction_roles.find_one({"_id": 0})
+        if not r:
+            reaction_roles.insert_one({"_id": 0})
+            r = reaction_roles.find_one({"_id": 0})
+        if str(payload.guild_id) not in r:
+            r.update({str(payload.guild_id): ""})
+            reaction_roles.delete_one({"_id": 0})
+            reaction_roles.insert_one(r)
+            r = reaction_roles.find_one({"_id": 0})
+
         if str(payload.message_id) in r:
             emoji = self.client.get_emoji(r[str(payload.message_id)][0])
             guild = self.client.get_guild(payload.guild_id)
             role = get(guild.roles, id=r[str(payload.message_id)][1])
             if payload.emoji.id == emoji.id:
-                await payload.member.add_roles(role)
-        with open("./suggestions.json", ) as f:
-            l = json.loads(f.read())
+                await payload.member.add_roles(role, reason="None")
+
+        suggestions = cluster["suggestions"]
+        l = suggestions.find_one({"_id": 0})
+        if not l:
+            suggestions.insert_one({"_id": 0})
+            l = prefix.find_one({"_id": 0})
+        if str(payload.guild_id) not in l:
+            suggestions.insert_one({"_id": 0})
+            l = prefix.find_one({"_id": 0})
+
         if str(payload.guild_id) in l:
             if str(payload.channel_id) == l[str(payload.guild_id)][0]:
                 if str(payload.message_id) in l[str(payload.guild_id)][1][0]:
@@ -61,8 +82,15 @@ class OnReaction(commands.Cog):
     @commands.guild_only()
     @commands.Cog.listener()
     async def on_raw_reaction_remove(self, payload):
-        with open("./reaction_roles.json", ) as f:
-            r = json.loads(f.read())
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        reaction_roles = cluster["reaction_roles"]
+        r = reaction_roles.find_one({"_id": 0})
+        if not r or str(payload.guild_id) not in r:
+            reaction_roles.insert_one({"_id": 0})
+            r = prefix.find_one({"_id": 0})
+
         if str(payload.message_id) in r:
             emoji = self.client.get_emoji(r[str(payload.message_id)][0])
             guild = self.client.get_guild(payload.guild_id)
@@ -72,9 +100,18 @@ class OnReaction(commands.Cog):
                 if member.bot:
                     return
                 await member.remove_roles(role)
+        client = pymongo.MongoClient(
+            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
+        cluster = client["Guardzilla"]
+        suggestions = cluster["suggestions"]
+        l = suggestions.find_one({"_id": 0})
+        if not l:
+            suggestions.insert_one({"_id": 0})
+            l = prefix.find_one({"_id": 0})
+        if str(payload.guild_id) not in l:
+            suggestions.insert_one({"_id": 0})
+            l = prefix.find_one({"_id": 0})
 
-        with open("./suggestions.json", ) as f:
-            l = json.loads(f.read())
         if str(payload.guild_id) in l:
             if str(payload.channel_id) == l[str(payload.guild_id)][0]:
                 if str(payload.message_id) in l[str(payload.guild_id)][1][0]:
