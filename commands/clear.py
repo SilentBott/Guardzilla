@@ -1,6 +1,7 @@
 import nextcord
 from nextcord.ext import commands
 import json
+import os
 
 
 class Clear(commands.Cog):

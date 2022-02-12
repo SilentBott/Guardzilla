@@ -2,6 +2,7 @@ import nextcord
 from nextcord.ext import commands, menus
 import json
 import pymongo
+import os
 
 
 def blocked(msg, words: list):

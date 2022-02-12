@@ -3,6 +3,7 @@ import nextcord
 import json
 from datetime import datetime, timezone, date
 import pymongo
+import os
 
 
 def msg_f(msg: dict):

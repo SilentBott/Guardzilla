@@ -1,6 +1,7 @@
 from nextcord.ext import commands
 import nextcord
 import pymongo
+import os
 
 
 class Nick(commands.Cog):

@@ -3,6 +3,7 @@ import nextcord
 import json
 from nextcord.ext import commands
 import pymongo
+import os
 
 
 def bot_admin(ctx):

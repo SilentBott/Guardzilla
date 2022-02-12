@@ -3,6 +3,7 @@ import json
 from nextcord.utils import get
 import nextcord
 import pymongo
+import os
 
 
 class OnReaction(commands.Cog):

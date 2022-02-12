@@ -3,6 +3,7 @@ from nextcord.ext import commands
 import nextcord
 from datetime import datetime, timezone
 import pymongo
+import os
 
 
 class Warn(commands.Cog):

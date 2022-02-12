@@ -2,6 +2,7 @@ import json
 from nextcord.ext import commands
 import nextcord
 import pymongo
+import os
 
 
 class SuggestRoom(commands.Cog):

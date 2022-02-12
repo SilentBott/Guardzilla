@@ -1,6 +1,7 @@
 from nextcord.ext import commands
 import json
 import pymongo
+import os
 
 
 class RemoveBadWords(commands.Cog):
