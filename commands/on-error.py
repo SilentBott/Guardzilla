@@ -29,7 +29,7 @@ class OnCommandError(commands.Cog):
             if pyFile.endswith(".py"):
                 self.allCommands.append(pyFile[:-3])
 
-    # @commands.Cog.listener()
+    @commands.Cog.listener()
     async def on_command_error(self, ctx, error):
         msg = ctx.message.content
         command = str(msg).split(" ")[0][1:]
