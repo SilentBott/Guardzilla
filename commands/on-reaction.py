@@ -68,9 +68,9 @@ class OnReaction(commands.Cog):
                             name=f"{member} Suggestion", icon_url=avatar_url)
                         embed.set_thumbnail(url=avatar_url)
                         embed.add_field(name="Up votes:",
-                                        value=f"{likes-1} Vote")
+                                        value=f"{likes-1} Vote{'s' if likes-1>1 else ''}")
                         embed.add_field(name="Down votes:",
-                                        value=f"{dislikes-1} Vote")
+                                        value=f"{dislikes-1} Vote{'s' if likes-1>1 else ''}")
                         if self.client.user.avatar:
                             embed.set_footer(text="Wants to send suggestion? Simply type in this channel!",
                                              icon_url=self.client.user.avatar.url)
@@ -135,9 +135,9 @@ class OnReaction(commands.Cog):
                             name=f"{member} Suggestion", icon_url=avatar_url)
                         embed.set_thumbnail(url=avatar_url)
                         embed.add_field(name="Up votes:",
-                                        value=f"{likes-1} Vote")
+                                        value=f"{likes-1} Vote{'s' if likes-1>1 else ''}")
                         embed.add_field(name="Down votes:",
-                                        value=f"{dislikes-1} Vote")
+                                        value=f"{dislikes-1} Vote{'s' if likes-1>1 else ''}")
                         if self.client.user.avatar:
                             embed.set_footer(text="Wants to send suggestion? Simply type in this channel!",
                                              icon_url=self.client.user.avatar.url)
