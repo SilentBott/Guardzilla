@@ -21,6 +21,10 @@ class OnMessage(commands.Cog):
     @commands.guild_only()
     @commands.Cog.listener()
     async def on_message(self, message):
+        with open("bot_admin.json", "r") as f:
+            admins = json.loads(f.read())["Admins"]
+        if str(message.author.id) in admins:
+            return
         if message.guild is None:
             return
         if message.author.bot:
