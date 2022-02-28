@@ -1,1 +1,1 @@
-worker: python "app.py"
+not_worker: python "app.py"
