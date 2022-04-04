@@ -4,6 +4,7 @@ import json
 import os
 import pymongo
 import os
+from keep_alive import keep_alive
 
 # Set environment variables
 # os.environ['info'] = "test:pass123"
@@ -43,5 +44,5 @@ for pyFile in os.listdir("./commands"):
         client.load_extension(f"commands.{pyFile[:-3]}")
         print(f"{pyFile[:-3]} | Loaded")
 
-
+keep_alive()
 client.run(TOKEN)
