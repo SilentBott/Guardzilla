@@ -7,13 +7,9 @@ import os
 
 
 def bot_admin(ctx):
-    client = pymongo.MongoClient(
-        f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
-    cluster = client["Guardzilla"]
-    Admin = cluster["Admin"]
-    r = reaction_roles.find_one({"_id": 0})
-
-    is_admin = str(ctx.message.author.id) in Admin["Admins"]
+    with open("bot_admin.json", ) as f:
+        data = json.loads(f.read())
+    is_admin = str(ctx.message.author.id) in data["Admins"]
     return is_admin
 
 
@@ -47,7 +43,7 @@ class Role(commands.Cog):
                 await ctx.send(f"There cog: {extension}\nis unloaded so we can't reload it")
             else:
                 await ctx.send(f"There isn't any cog to reload with the name: {extension}.")
-        os.system("cls")
+        os.system("clear")
 
 
 def setup(client):

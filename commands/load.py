@@ -6,19 +6,9 @@ import pymongo
 
 
 def bot_admin(ctx):
-    client = pymongo.MongoClient(
-        f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
-    cluster = client["Guardzilla"]
-    bot_admin = cluster["bot_admin"]
-    r = bot_admin.find_one({"_id": 0})
-    if not r:
-        bot_admin.insert_one({"_id": 0, "Admins": ["821486817957642242"]})
-        r = prefix.find_one({"_id": 0})
-    if str(message.guild.id) not in r:
-        bot_admin.insert_one({"_id": 0, "Admins": ["821486817957642242"]})
-        r = prefix.find_one({"_id": 0})
-
-    is_admin = str(ctx.message.author.id) in r["Admins"]
+    with open("bot_admin.json", ) as f:
+        data = json.loads(f.read())
+    is_admin = str(ctx.message.author.id) in data["Admins"]
     return is_admin
 
 
