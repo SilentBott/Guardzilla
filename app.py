@@ -3,6 +3,11 @@ from nextcord.ext import commands
 import json
 import os
 import pymongo
+import os
+
+# Set environment variables
+# os.environ['info'] = "test:pass123"
+# os.environ['TOKEN'] = "MY-AWSOME-TOKEN"
 
 
 intents = nextcord.Intents.all()
