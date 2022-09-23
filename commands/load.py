@@ -1,8 +1,8 @@
+#import the required modules
 from nextcord.ext import commands
 import os
 import nextcord
 import json
-import pymongo
 
 
 def bot_admin(ctx):
@@ -13,7 +13,6 @@ def bot_admin(ctx):
 
 
 class Load(commands.Cog):
-
     def __init__(self, client):
         self.client = client
 
@@ -27,12 +26,15 @@ class Load(commands.Cog):
         try:
             self.client.load_extension(f"commands.{extension}")
             await ctx.send(f"The {extension} loaded successfully.")
-        except (nextcord.ext.commands.errors.ExtensionNotFound, nextcord.ext.commands.errors.ExtensionAlreadyLoaded):
+        except (nextcord.ext.commands.errors.ExtensionNotFound,
+                nextcord.ext.commands.errors.ExtensionAlreadyLoaded):
             if extension in commands_names:
                 await ctx.send(f"The {extension} already loaded.")
             else:
-                await ctx.send(f"There isn't any cog with the name: {extension}.")
+                await ctx.send(
+                    f"There isn't any cog with the name: {extension}.")
 
 
+# add the command as cog
 def setup(client):
     client.add_cog(Load(client))

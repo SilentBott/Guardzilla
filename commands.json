@@ -2,7 +2,8 @@
     "Home": [{}, "", ""],
 
     "General Commands": [{
-        "ticket": ["", "to make tickets", "", ["prefix-ticket"], ""]
+        "ticket": ["", "to make tickets", "", ["prefix-ticket"], ""],
+       "h": ["", "to search about a solve in stackOverFlow", "", ["prefix-h"], ""]
     }, "", "To show General Commands"],
 
     "Admin Commands": [{

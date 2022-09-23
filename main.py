@@ -1,25 +1,19 @@
 import nextcord
 from nextcord.ext import commands
-import json
 import os
 import pymongo
-import os
-from keep_alive import keep_alive
+from webserver import keep_alive
 
 # Set environment variables
-# os.environ['info'] = "test:pass123"
-# os.environ['TOKEN'] = "MY-AWSOME-TOKEN"
-
 
 intents = nextcord.Intents.all()
 TOKEN = os.environ['TOKEN']
 
 
 async def prefix_d(_, message):
-    f = pymongo.MongoClient(
-        f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
-    cluster = f["Guardzilla"]
-    prefix = cluster["prefix"]
+    dbclient = pymongo.MongoClient(os.environ["mongoDBclient"])
+    db = dbclient[str(message.guild.id)]
+    prefix = db["prefix"]
     prefix_x = prefix.find_one({"_id": 0})
     if not prefix_x or str(message.guild.id) not in prefix_x:
         prefix.delete_one({"_id": 0})
@@ -30,8 +24,10 @@ async def prefix_d(_, message):
     else:
         return str(client.user.id)
 
-client = nextcord.ext.commands.Bot(
-    command_prefix=prefix_d, intents=intents, help_command=None)
+
+client = commands.Bot(command_prefix=prefix_d,
+                                   intents=intents,
+                                   help_command=None)
 
 
 @client.event
@@ -45,4 +41,9 @@ for pyFile in os.listdir("./commands"):
         print(f"{pyFile[:-3]} | Loaded")
 
 keep_alive()
-client.run(TOKEN)
+try:
+    client.run(os.getenv('TOKEN'))
+except nextcord.errors.HTTPException:
+    os.system("kill 1")
+    os.system("python main.py")
+    print("rate limit ! /n/nRestarting./n/n")

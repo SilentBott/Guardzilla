@@ -1,6 +1,5 @@
 from nextcord.ext import commands
 import nextcord
-import os
 
 
 class Ping(commands.Cog):

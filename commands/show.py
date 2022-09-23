@@ -1,12 +1,8 @@
 from nextcord.ext import commands
 import nextcord
-from nextcord.utils import get
-import pymongo
-import os
 
 
 class Show(commands.Cog):
-
     def __init__(self, client):
         self.client = client
 
@@ -24,12 +20,15 @@ class Show(commands.Cog):
             channel = await ctx.guild.fetch_channel(channel)
         l = channel.permissions_for(ctx.guild.default_role)
         if not l.view_channel:
-            await channel.set_permissions(ctx.guild.default_role, view_channel=True)
+            await channel.set_permissions(ctx.guild.default_role,
+                                          view_channel=True)
             embed = nextcord.Embed(
-                description=f"The channel {channel.mention} showed sucessfully.", color=0x00ff00)
+                description=
+                f"The channel {channel.mention} showed sucessfully.",
+                color=0x00ff00)
         else:
-            embed = nextcord.Embed(
-                description="The channel already showen", color=0x00ff00)
+            embed = nextcord.Embed(description="The channel already showen",
+                                   color=0x00ff00)
         await ctx.send(embed=embed)
 
 

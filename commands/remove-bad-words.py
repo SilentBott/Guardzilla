@@ -1,8 +1,7 @@
 from nextcord.ext import commands
 import json
 import pymongo
-import os
-
+from os import environ as getenv
 
 class RemoveBadWords(commands.Cog):
 
@@ -14,9 +13,8 @@ class RemoveBadWords(commands.Cog):
     @commands.command(name="remove-bad-words")
     async def removebadwords(self, ctx, *, bad_words):
         bad_word = False
-        cluster = pymongo.MongoClient(
-            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")["Guardzilla"]
-        blockedWords = cluster["blockedwords"]
+        db = pymongo.MongoClient(getenv["mongoDBclient"])[ctx.message.guild.id]
+        blockedWords = db["blockedwords"]
         data = blockedWords.find_one({"_id": 0})
         words, blocked_words = [], []
         for i in range(len(str(bad_words).split('"'))//2):

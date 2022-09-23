@@ -1,13 +1,11 @@
-import json
 from nextcord.ext import commands
 import nextcord
 from datetime import datetime, timezone
 import pymongo
-import os
+from os import environ as getenv
 
 
 class Warn(commands.Cog):
-
     def __init__(self, client):
         self.client = client
 
@@ -23,15 +21,13 @@ class Warn(commands.Cog):
             member = member.split("<@")[1].split(">")[0].replace("!", "")
         member = await ctx.guild.fetch_member(member)
         if str(member.id) == str(ctx.author.id):
-            embed = nextcord.Embed(
-                color=0x00ff00, title="You cannot warn yourself")
+            embed = nextcord.Embed(color=0x00ff00,
+                                   title="You cannot warn yourself")
             await ctx.send(embed=embed)
             return
         embed = nextcord.Embed(color=0x00ff00)
-        client = pymongo.MongoClient(
-            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
-        cluster = client["Guardzilla"]
-        warns = cluster["warns"]
+        db = pymongo.MongoClient(getenv["mongoDBclient"])[ctx.message.guild.id]
+        warns = db["warns"]
         warnings = warns.find_one({"_id": 0})
 
         time = str(datetime.utcnow().replace(
@@ -56,7 +52,9 @@ class Warn(commands.Cog):
         warns.insert_one(warnings)
 
         embed = nextcord.Embed(
-            title=f"The member {member.display_name} | {member.id}\nwarned Reason:\n``` {reason} ```", color=0x00ff00)
+            title=
+            f"The member {member.display_name} | {member.id}\nwarned Reason:\n``` {reason} ```",
+            color=0x00ff00)
         embed.set_footer(
             text=f"Warned by: {ctx.author.name} | {ctx.author.id}")
         await ctx.send(embed=embed)

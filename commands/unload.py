@@ -1,14 +1,12 @@
 import json
-import pymongo
 from nextcord.ext import commands
 import os
 import nextcord
-import os
 
 
 def bot_admin(ctx):
     with open("bot_admin.json", ) as f:
-        data = json.loads(f.read())
+      data = json.loads(f.read())
     is_admin = str(ctx.message.author.id) in data["Admins"]
     return is_admin
 
@@ -28,7 +26,7 @@ class UnLoad(commands.Cog):
         try:
             self.client.unload_extension(f"commands.{extension}")
             await ctx.send(f"The {extension} unloaded successfully.")
-        except (nextcord.ext.commands.errors.ExtensionNotLoaded, nextcord.ext.commands.errors.ExtensionNotFound) as r:
+        except (nextcord.ext.commands.errors.ExtensionNotLoaded, nextcord.ext.commands.errors.ExtensionNotFound):
             if extension in commands_names:
                 await ctx.send(f"The {extension} already unloaded.")
             else:

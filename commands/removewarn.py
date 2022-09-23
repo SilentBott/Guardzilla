@@ -2,8 +2,7 @@ import json
 from nextcord.ext import commands
 import nextcord
 import pymongo
-import os
-
+from os import environ as getenv
 
 class RemoveWarn(commands.Cog):
 
@@ -21,10 +20,8 @@ class RemoveWarn(commands.Cog):
         member = await ctx.guild.fetch_member(member)
 
         embed = nextcord.Embed(color=0x00ff00)
-        client = pymongo.MongoClient(
-            f"mongodb+srv://{os.environ['info']}@cluster0.o0xc5.mongodb.net/myFirstDatabase?retryWrites=true&w=majority")
-        cluster = client["Guardzilla"]
-        warns = cluster["warns"]
+        db = pymongo.MongoClient(getenv["mongoDBclient"])[ctx.message.guild.id]
+        warns = db["warns"]
         warnings = warns.find_one({"_id": 0})
 
         if str(ctx.guild.id) in warnings:
