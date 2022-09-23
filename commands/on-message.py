@@ -34,7 +34,7 @@ class OnMessage(commands.Cog):
         blockedWords = cluster["blockedwords"]
         log = blockedWords.find_one({"_id": 0})
         if not log:
-            blockedWords.insert_one({"_id": 0, str(message.guild.id): [0, []]})
+            blockedWords.insert_one({"_id": 0   , str(message.guild.id): [0, []]})
             log = blockedWords.find_one({"_id": 0})
         try:
             blocked_true, words = log[str(message.guild.id)]

@@ -1,0 +1,123 @@
+import pyautogui
+import time
+import keyboard
+
+time.sleep(0.2)
+
+while True:
+
+
+   #for l blais
+    pyautogui.onScreen(y = 1878,x =443)
+    time.sleep(0.5)
+
+    pyautogui.onScreen( y = 1716,x = 441)
+    time.sleep(0.5)
+
+    pyautogui.onScreen(y = 1850,x = 473 )
+    time.sleep(0.5)
+
+    pyautogui.onScreen(y = 1877,x= 503)
+    time.sleep(0.5)
+
+
+
+    pyautogui.onScreen(y=1816,x=501) 
+    time.sleep(0.5)
+
+
+
+
+    pyautogui.onScreen(y = 1496,x =678)
+    time.sleep(0.5)
+
+    pyautogui.onScreen( y = 1436,x = 685)
+    time.sleep(0.5)
+
+    pyautogui.onScreen(y = 1467,x = 705)
+    time.sleep(0.5)
+
+    pyautogui.onScreen(y = 1499,x= 744)
+    time.sleep(0.5)
+
+    pyautogui.onScreen(y = 1438,x= 742)
+    time.sleep(0.5)
+
+#for sell 
+    pyautogui.onScreen(y = 2441 ,x= 741)
+    time.sleep(0.5)
+
+    pyautogui.onScreen(y = 2012 ,x= 313)
+    time.sleep(0.5)
+
+
+    pyautogui.onScreen(y = 2193,x= 537)
+    time.sleep(0.5)
+
+    pyautogui.onScreen(y = 2029 ,x= 443)
+    time.sleep(0.5)
+
+
+
+#for buy
+
+
+    pyautogui.onScreen(y = 2025 ,x= 362)
+    time.sleep(0.5)
+
+    pyautogui.onScreen(y = 2199,x= 521)
+    time.sleep(0.5)
+
+    pyautogui.onScreen(y = 2371 ,x= 354)
+    time.sleep(0.5)
+
+
+
+#for zre3
+    pyautogui.onScreen(y = 1878,x =443)
+    time.sleep(0.5)
+
+    pyautogui.onScreen( y = 1716,x = 441)
+    time.sleep(0.5)
+
+    pyautogui.onScreen(y = 1850,x = 473 )
+    time.sleep(0.5)
+
+    pyautogui.onScreen(y = 1877,x= 503)
+    time.sleep(0.5)
+
+    pyautogui.onScreen(y=1816,x=501)
+    time.sleep(0.5)
+
+
+
+
+    pyautogui.onScreen(y = 1496,x =678)
+    time.sleep(0.5)
+
+    pyautogui.onScreen( y = 1436,x = 685)
+    time.sleep(0.5)
+
+    pyautogui.onScreen(y = 1467,x = 705)
+    time.sleep(0.5)
+
+    pyautogui.onScreen(y = 1499,x= 744)
+    time.sleep(0.5)
+
+    pyautogui.onScreen(y = 1438,x= 742)
+    time.sleep(0.5)
+
+
+
+
+
+
+
+    if keyboard.is_pressed('s'): 
+
+        break
+    else: 
+        continue 
+
+    i = 5
+o = 8
