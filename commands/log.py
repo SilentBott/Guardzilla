@@ -129,11 +129,11 @@ class Log(commands.Cog):
                             "From: ",
                             f"{before.author.name} | {before.author.id}"
                         ], ["Before: ", f"{before.content}"],
-                         ["after: ", f"{after.content}"],
-                         [
-                             "channel:",
-                             f"{before.channel.name} | {before.channel.id}"
-                         ], ["Msg id:", f"{before.id}"]]
+                            ["after: ", f"{after.content}"],
+                            [
+                            "channel:",
+                            f"{before.channel.name} | {before.channel.id}"
+                        ], ["Msg id:", f"{before.id}"]]
                     })
                     channel = await before.guild.fetch_channel(log_c)
                     await channel.send(embed=embed)
@@ -164,11 +164,11 @@ class Log(commands.Cog):
                         "From: ",
                         f"{message.author.name} | {message.author.id}"
                     ], ["The msg: ", "is embed"],
-                     ["Deleter: ", f"{deleter.name} | {deleter.id}"],
-                     [
-                         "channel:",
-                         f"{message.channel.name} | {message.channel.id}"
-                     ], ["Msg id:", message.id]]
+                        ["Deleter: ", f"{deleter.name} | {deleter.id}"],
+                        [
+                        "channel:",
+                        f"{message.channel.name} | {message.channel.id}"
+                    ], ["Msg id:", message.id]]
                 })
             else:
                 embed = msg_f({
@@ -179,11 +179,11 @@ class Log(commands.Cog):
                         "From: ",
                         f"{message.author.name} | {message.author.id}"
                     ], ["The msg: ", f"{message.content}"],
-                     ["Deleter: ", f"{deleter.name} | {deleter.id}"],
-                     [
-                         "channel:",
-                         f"{message.channel.name} | {message.channel.id}"
-                     ], ["Msg id:", message.id]]
+                        ["Deleter: ", f"{deleter.name} | {deleter.id}"],
+                        [
+                        "channel:",
+                        f"{message.channel.name} | {message.channel.id}"
+                    ], ["Msg id:", message.id]]
                 })
             channel = await message.guild.fetch_channel(log_c)
             await channel.send(embed=embed)
@@ -280,7 +280,7 @@ class Log(commands.Cog):
                          [
                              "Changed by:",
                              f"{entry.user.name} | {entry.user.id}", False
-                         ]]
+                        ]]
                     })
                     channel = await before.guild.fetch_channel(log_c)
                     await channel.send(embed=embed)
@@ -301,7 +301,7 @@ class Log(commands.Cog):
                              [
                                  "Role:",
                                  f"{entery.changes.after.roles[0].name} | {entery.changes.after.roles[0].id}"
-                             ]]
+                            ]]
                         })
                         o = True
                     elif len(before.roles) > len(after.roles):
@@ -314,7 +314,7 @@ class Log(commands.Cog):
                              [
                                  "Role:",
                                  f"{entery.changes.before.roles[0].name} | {entery.changes.before.roles[0].id}"
-                             ]]
+                            ]]
                         })
                         o = True
                     if o:
@@ -399,7 +399,7 @@ class Log(commands.Cog):
                          perm[0].replace("_", " ") for perm in role.permissions
                          if perm[1]
                      ]), False
-                 ]]
+                ]]
             })
             channel = await role.guild.fetch_channel(log_c)
             await channel.send(embed=embed)
@@ -485,7 +485,7 @@ class Log(commands.Cog):
     @commands.guild_only()
     @commands.Cog.listener()
     async def on_voice_state_update(self, member, before, after):
-        db = pymongo.MongoClient(getenv["mongoDBclient"])[str(before.guild.id)]
+        db = pymongo.MongoClient(getenv["mongoDBclient"])[str(member.guild.id)]
         logs = db["logs"]
         log = logs.find_one({"_id": 0})
         if not log:
@@ -509,7 +509,7 @@ class Log(commands.Cog):
                      [
                          "Joining to: ",
                          f"{after.channel.name} | {after.channel.id}"
-                     ]]
+                    ]]
                 }
 
                 # join vc
@@ -522,7 +522,7 @@ class Log(commands.Cog):
                      [
                          "Leaving from:",
                          f"{before.channel.name} | {before.channel.id}"
-                     ]]
+                    ]]
                 }
                 # leave vc
             else:
@@ -536,11 +536,11 @@ class Log(commands.Cog):
                      [
                          "Switching from:",
                          f"{before.channel.name} | {before.channel.id}"
-                     ],
-                     [
+                    ],
+                        [
                          "Switching to:",
                          f"{after.channel.name} | {after.channel.id}"
-                     ]]
+                    ]]
                 }
                 # switch vc
             embed = msg_f(msg)
